@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+
+begin
+  require 'rubygems'
+rescue LoadError
+  # no rubygems to load, so we fail silently
+end
+
+require 'optparse'
+
+@options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: #{$0} [options] [args]"
+
+  opts.on("-A", "--apply-to DIRECTORY",
+    "Create a minimal set of scripts and recipes",
+    "for use with capistrano to configure servers."
+  ) { |value| @options[:apply_to] = value }
+  opts.on("-n", "--name APPLICATION_NAME",
+    "Name of application."
+  ) { |value| @options[:application] = value }
+  opts.on("-d", "--domain DOMAIN_NAME",
+    "Domain name for application."
+  ) { |value| @options[:domain] = value }
+ 
+  if ARGV.empty?
+    puts opts
+      exit
+  else
+    opts.parse!(ARGV)
+  end
+end
+
+require 'railsmachine/generators/loader'
+RailsMachine::Generators::RailsLoader.load! @options

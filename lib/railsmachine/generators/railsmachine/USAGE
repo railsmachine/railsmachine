@@ -1,0 +1,12 @@
+NAME
+     railsmachine - creates configuration and SwitchTower tasks for server configuration.
+
+SYNOPSIS
+     railsmachine [Application name]
+
+DESCRIPTION
+     This generator creates rakefiles and deployment recipes.
+
+            
+EXAMPLE
+      ./script/generate railsmachine MyRockinApp

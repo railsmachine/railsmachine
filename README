@@ -1,0 +1,23 @@
+== Railsmachine
+
+A set of capistrano recipes for simplifying the deployment of Rails applications.
+
+The deployment process looks like this:
+
+cd <app_directory>
+capify .
+railsmachine --apply-to . --name <app_name> --domain <yourdomain.com>
+cap repos:setup
+cd ../<app_name>_machine
+cap servers:setup deploy:cold
+
+Under the default configuration the gem will use these directories:
+
+/var/www/apps/            - Rails applications
+/etc/httpd/conf/apps/     - Apache configurations
+/var/run/mongrel_cluster/ - Mongrel pid files
+/etc/mongrel_cluster/     - Mongrel cluster configurations
+
+You will need a 'deploy' system account with write access to the above directories.
+You also need a 'deploy' mysql account with all privileges on *.* and grant option.
+
