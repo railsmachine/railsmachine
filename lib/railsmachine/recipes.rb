@@ -4,7 +4,8 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :keep_releases, 3
   set :app_symlinks, nil  
   set :httpd, :apache
-  
+  set :app_server, :mongrel
+
   set :repository do
     scm = fetch(:scm)
     repos_base = "#{user}@#{domain}#{deploy_to}"
@@ -18,7 +19,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   # defer requires until variables have been set
   task :require_recipes do
-    require 'railsmachine/recipes/mongrel'
+    require "railsmachine/recipes/scm/#{app_server}"
     require "railsmachine/recipes/scm/#{scm}"
     require "railsmachine/recipes/web/#{httpd}"
     db = YAML.load_file('config/database.yml')[rails_env]["adapter"]
@@ -54,31 +55,42 @@ Capistrano::Configuration.instance(:must_exist).load do
   
     desc 'Setup mongrel'
     task :setup, :roles => :app  do
-      set :mongrel_environment, rails_env
-      set :mongrel_port, apache_proxy_port
-      set :mongrel_servers, apache_proxy_servers
-      set :mongrel_user, user unless mongrel_user
-      set :mongrel_group, mongrel_user unless mongrel_group
-      set_mongrel_conf
-      mongrel.cluster.configure
+      as = fetch(:app_server)
+      if as == :mongrel
+        setup_mongrel
+      elsif as == :passenger
+        setup_passenger
+      end
     end
     
     desc "Restart application server."
     task :restart, :roles => :app  do
-      set_mongrel_conf
-      mongrel.cluster.restart
+      as = fetch(:app_server)
+      if as == :mongrel
+        restart_mongrel
+      elsif as == :passenger
+        restart_passenger
+      end
     end
     
     desc "Start application server."
     task :start, :roles => :app  do
-      set_mongrel_conf
-      mongrel.cluster.start
+      as = fetch(:app_server)
+      if as == :mongrel
+        start_mongrel
+      elsif as == :passenger
+        start_passenger
+      end
     end
     
     desc "Stop application server."
     task :stop, :roles => :app  do
-      set_mongrel_conf
-      mongrel.cluster.stop
+      as = fetch(:app_server)
+      if as == :mongrel
+        stop_mongrel
+      elsif as == :passenger
+        stop_passenger
+      end
     end
   
     namespace :symlinks do
@@ -154,5 +166,47 @@ Capistrano::Configuration.instance(:must_exist).load do
   def set_mongrel_conf
     set :mongrel_conf, "/etc/mongrel_cluster/#{application}.conf" unless mongrel_conf
   end 
+
+  def setup_mongrel
+    set :mongrel_environment, rails_env
+    set :mongrel_port, apache_proxy_port
+    set :mongrel_servers, apache_proxy_servers
+    set :mongrel_user, user unless mongrel_user
+    set :mongrel_group, mongrel_user unless mongrel_group
+    set_mongrel_conf
+    mongrel.cluster.configure
+  end
+
+  def restart_mongrel
+    set_mongrel_conf
+    mongrel.cluster.restart
+  end
   
+  def start_mongrel
+    set_mongrel_conf
+    mongrel.cluster.start
+  end
+
+  def stop_mongrel
+    set_mongrel_conf
+    mongrel.cluster.stop
+  end
+
+  def setup_passenger
+    set :pasenger_environment, rails_env
+    set :passenger_user, user unless passenger_user
+    set :passenger_group, passenger_user unless passenger_group
+  end
+
+  def restart_passenger
+    passenger.restart
+  end
+  
+  def start_passenger
+    passenger.start
+  end
+
+  def stop_passenger
+    passenger.stop
+  end
 end

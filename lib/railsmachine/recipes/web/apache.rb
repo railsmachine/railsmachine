@@ -27,12 +27,12 @@ Capistrano::Configuration.instance(:must_exist).load do
       server_aliases.concat apache_server_aliases
       set :apache_server_aliases_array, server_aliases
       
-      file = File.join(File.dirname(__FILE__), "templates", "httpd.conf")
+      file = File.join(File.dirname(__FILE__), "templates", fetch(:app_server), "httpd.conf")
       template = File.read(file)
       buffer = ERB.new(template).result(binding)
       
       if apache_ssl_enabled
-        file = File.join(File.dirname(__FILE__), "templates", "httpd-ssl.conf")
+        file = File.join(File.dirname(__FILE__), "templates", fetch(:app_server), "httpd-ssl.conf")
         template = File.read(file)
         ssl_buffer = ERB.new(template).result(binding)
         buffer += ssl_buffer
