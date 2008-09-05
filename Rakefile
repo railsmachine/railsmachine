@@ -15,7 +15,7 @@ setup_rdoc ['README', 'LICENSE', 'COPYING', 'lib/**/*.rb', 'doc/**/*.rdoc']
 desc "Does a full compile, test run"
 task :default => [:test, :package]
 
-version="1.9.0"
+version="2.0.0"
 name="railsmachine"
 
 setup_gem(name, version) do |spec|
