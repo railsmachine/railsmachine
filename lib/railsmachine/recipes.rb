@@ -20,7 +20,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   # defer requires until variables have been set
   task :require_recipes do
     require "railsmachine/recipes/app/#{app_server}"
-    require "railsmachine/recipes/scm/#{scm}"
+    # require "railsmachine/recipes/scm/#{scm}"
     require "railsmachine/recipes/web/#{httpd}"
     db = YAML.load_file('config/database.yml')[rails_env]["adapter"]
     require "railsmachine/recipes/db/#{db}" if %w(mysql postgresql).include? db
