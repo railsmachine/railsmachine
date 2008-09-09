@@ -2,9 +2,21 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   default_run_options[:pty] = true
   set :keep_releases, 3
-  set :app_symlinks, nil  
+  set :app_symlinks, nil
+
+  set :scm, :subversion
+  set :valid_scm, [:subversion, :git]
+
   set :httpd, :apache
+  set :valid_httpds, [:apache, :nginx]
+
   set :app_server, :mongrel
+  set :valid_app_servers, [:mongrel, :passenger]
+
+  set :db_adapter, :mysql
+  set :valid_db_adapters, [:mysql, :postgresql, :sqlite3]
+
+  set :rails_env, "production"
 
   set :repository do
     scm = fetch(:scm)
@@ -19,11 +31,14 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   # defer requires until variables have been set
   task :require_recipes do
+    raise Capistrano::Error, "You do not have a valid app_server set!" unless valid_app_servers.include? app_server
     require "railsmachine/recipes/app/#{app_server}"
+    # TODO Fix SCM namespace that was throwings errors
     # require "railsmachine/recipes/scm/#{scm}"
+    raise Capistrano::Error, "You do not have a valid httpd set!" unless valid_httpds.include? httpd
     require "railsmachine/recipes/web/#{httpd}"
-    db = YAML.load_file('config/database.yml')[rails_env]["adapter"]
-    require "railsmachine/recipes/db/#{db}" if %w(mysql postgresql).include? db
+    raise Capistrano::Error, "You do not have a valid db_adapter set!" unless valid_db_adapters.include? db_adapter
+    require "railsmachine/recipes/db/#{db_adapter}"
   end
   
   namespace :servers do
