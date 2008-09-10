@@ -5,7 +5,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :app_symlinks, nil
 
   set :scm, :subversion
-  set :valid_scm, [:subversion, :git]
+  set :valid_scms, [:subversion, :git]
 
   set :httpd, :apache
   set :valid_httpds, [:apache, :nginx]
@@ -29,15 +29,21 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
 
   
+  task :validate_required_variables do
+    raise ArgumentError, invalid_variable_value(scm, "scm", valid_scms) unless valid?(scm, valid_scms)
+    raise ArgumentError, invalid_variable_value(app_server, "app_server", valid_app_servers) unless valid?(app_server, valid_app_servers)
+    raise ArgumentError, invalid_variable_value(httpd, "httpd", valid_httpds) unless valid?(httpd, valid_httpds)
+    raise ArgumentError, invalid_variable_value(db_adapter, "db_adapter", valid_db_adapters) unless valid?(db_adapter, valid_db_adapters)
+  end
+
+  before :require_recipes, :validate_required_variables
+
   # defer requires until variables have been set
   task :require_recipes do
-    raise Capistrano::Error, "You do not have a valid app_server set!" unless valid_app_servers.include? app_server
     require "railsmachine/recipes/app/#{app_server}"
     # TODO Fix SCM namespace that was throwings errors
     # require "railsmachine/recipes/scm/#{scm}"
-    raise Capistrano::Error, "You do not have a valid httpd set!" unless valid_httpds.include? httpd
     require "railsmachine/recipes/web/#{httpd}"
-    raise Capistrano::Error, "You do not have a valid db_adapter set!" unless valid_db_adapters.include? db_adapter
     require "railsmachine/recipes/db/#{db_adapter}"
   end
   
@@ -223,5 +229,18 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   def stop_passenger
     passenger.stop
+  end
+
+  def invalid_variable_value(value, name, valid_options)
+    error_msg("'#{value}' is not a valid :#{name}.  Please set :#{name} to one of the following: #{valid_options.join(", ")}")
+  end
+
+  def error_msg(msg)
+    banner = ''; msg.length.times { banner << "+" }
+    return "\n\n#{banner}\n#{msg}\n#{banner}\n\n"
+  end
+
+  def valid?(value, collection)
+    collection.collect { |i| i.to_s }.include? value.to_s
   end
 end
