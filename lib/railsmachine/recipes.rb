@@ -41,8 +41,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   # defer requires until variables have been set
   task :require_recipes do
     require "railsmachine/recipes/app/#{app_server}"
-    # TODO Fix SCM namespace that was throwings errors
-    # require "railsmachine/recipes/scm/#{scm}"
+    require "railsmachine/recipes/scm/#{scm}"
     require "railsmachine/recipes/web/#{httpd}"
     require "railsmachine/recipes/db/#{db_adapter}"
   end

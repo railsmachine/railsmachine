@@ -46,6 +46,12 @@ role :app, domain
 role :db,  domain, :primary => true
 role :scm, domain
 
+
+# =============================================================================
+# APPLICATION SERVER OPTIONS
+# ============================================================================= 
+set :app_server, "passenger"  # mongrel or passenger
+
 # =============================================================================
 # WEB SERVER OPTIONS
 # =============================================================================
@@ -62,6 +68,8 @@ role :scm, domain
 # set :httpd_ssl_ip, "127.0.0.1"
 # set :httpd_ssl_forward_all, false
 # set :httpd_ctl, "/etc/init.d/httpd"
+
+
 
 # =============================================================================
 # MONGREL OPTIONS
@@ -84,13 +92,7 @@ role :scm, domain
 # SCM OPTIONS
 # =============================================================================
 # set :scm, :subversion
-set :repository do
-  if scm == :subversion
-    "svn+ssh://#{user}@#{domain}#{deploy_to}/repos/trunk"
-  elsif scm == :git
-    "ssh://#{user}@#{domain}#{deploy_to}/repos"
-  end
-end
+set :repository, scm == :subversion ? "svn+ssh://#{user}@#{domain}#{deploy_to}/repos/trunk" : "ssh://#{user}@#{domain}#{deploy_to}/repos"
 
 # =============================================================================
 # SSH OPTIONS
