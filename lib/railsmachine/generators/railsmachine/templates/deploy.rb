@@ -24,6 +24,8 @@ set :domain, "<%= domain_name %>"
 
 # Login user for ssh.
 set :user, "deploy"
+set :runner, user
+set :admin_runner, user
 
 # Rails environment. Used by application setup tasks and migrate tasks.
 set :rails_env, "production"

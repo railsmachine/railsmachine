@@ -164,15 +164,14 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
   
   namespace :repos do
-    
     desc "Setup source control repository."
     task :setup, :roles => :scm  do
     begin
-      scm.setup
+      localrepo.setup
     rescue
       puts "repos:setup failed!"
     end
-      scm.import
+      localrepo.import
     end
   
   end

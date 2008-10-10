@@ -1,7 +1,7 @@
 require 'fileutils'
 Capistrano::Configuration.instance(:must_exist).load do
  
-  namespace :scm do
+  namespace :localrepo do
 
     desc "Setup svn repository"
     task :setup, :roles => :scm do

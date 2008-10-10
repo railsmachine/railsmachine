@@ -1,7 +1,7 @@
 require 'fileutils'
 Capistrano::Configuration.instance(:must_exist).load do
  
-  namespace :scm do
+  namespace :localrepo do
      
     desc "Setup directory structure and initialize git repository on remote server"
     task :setup, :roles => :scm do
