@@ -15,21 +15,23 @@ setup_rdoc ['README', 'LICENSE', 'COPYING', 'lib/**/*.rb', 'doc/**/*.rdoc']
 desc "Does a full compile, test run"
 task :default => [:test, :package]
 
-version="2.0.0"
+version="1.0.2"
 name="railsmachine"
 
 setup_gem(name, version) do |spec|
   spec.summary = "The Rails Machine task library"
   spec.description = spec.summary
-  spec.author="Bradley Taylor, Rob Lingle, Charles Brian Quinn"
+  spec.author="Rails Machine"
   spec.add_dependency('capistrano', '>= 2.1.0')
   spec.has_rdoc = false
   spec.files += Dir.glob("bin/*")
   spec.files += Dir.glob("resources/**/*")
   spec.default_executable = "railsmachine"
   spec.executables = ["railsmachine"]
+  spec.email = "support@railsmachine.com"
+  spec.homepage = "http://railsmachine.com/"
+  spec.rubyforge_project = "railsmachine"
 end
-
 
 task :install => [:test, :package] do
   sh %{sudo gem install pkg/#{name}-#{version}.gem}

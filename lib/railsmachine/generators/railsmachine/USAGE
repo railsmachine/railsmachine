@@ -1,5 +1,5 @@
 NAME
-     railsmachine - creates configuration and SwitchTower tasks for server configuration.
+     railsmachine - creates configuration and capistrano tasks for server configuration.
 
 SYNOPSIS
      railsmachine [Application name]
