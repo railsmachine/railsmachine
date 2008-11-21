@@ -271,10 +271,6 @@ PassengerRuby #{rubypath}
   after   'deploy:cold', 'web:reload'
   after   :deploy,'deploy:cleanup'
   
-  def set_mongrel_conf
-    set :mongrel_conf, "/etc/mongrel_cluster/#{application}.conf" unless mongrel_conf
-  end 
-
   def setup_mongrel
     set :mongrel_environment, rails_env
     set :mongrel_port, apache_proxy_port
