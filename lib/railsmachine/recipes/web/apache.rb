@@ -25,8 +25,8 @@ Capistrano::Configuration.instance(:must_exist).load do
       run("[ -f #{apache_conf} ] && echo \"yes\" || echo \"no\"") do |c, s, o|
         if o =~ /yes?/
           backup = "#{apache_conf}.old.#{Time.now.strftime('%Y%m%d%H%M%S')}"
-          exit if Capistrano::CLI.ui.ask("WARNING: You are about to change your existing Apache configuration. A backup will be kept at #{backup}. Are you sure you want to proceed? [y/N]").upcase != "Y"
-          send(run_method, "mv #{apache_conf} #{backup}")
+          send(run_method, "cp #{apache_conf} #{backup}")
+          exit if Capistrano::CLI.ui.ask("WARNING: You are about to change your existing Apache configuration. A backup has been created at #{backup}. Are you sure you want to proceed? [y/N]").upcase != "Y"
         end
       end
       
