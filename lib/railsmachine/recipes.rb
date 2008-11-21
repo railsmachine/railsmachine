@@ -209,6 +209,66 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
   end
   
+  namespace :install do
+    desc "Install Phusion Passenger"
+      task :passenger, :roles => :web do
+        intall_gcc_compiler
+        install_passenger_module
+        config_passenger
+      end
+
+      task :intall_gcc_compiler, :roles => :web do
+        sudo "yum install gcc-c++ -y"
+      end  
+
+      task :install_passenger_module, :roles => :web do
+        sudo "gem install passenger --no-ri --no-rdoc"
+        input = ''
+        run "sudo passenger-install-apache2-module" do |ch,stream,out|
+          next if out.chomp == input.chomp || out.chomp == ''
+          print out
+          ch.send_data(input = $stdin.gets) if out =~ /(Enter|ENTER)/
+        end
+      end
+
+      task :config_passenger, :roles => :web do
+        version = 'ERROR'
+        arch = ''
+        rubypath = '/usr/bin/ruby'
+        
+        run("gem list | grep passenger") do |ch, stream, data|
+          version = data.sub(/passenger \(([^),]+).*/,"\\1").strip
+        end
+        
+        run("which ruby") do |ch, stream, data|
+          rubypath = data.strip
+        end
+        
+        run("uname -i") do |ch, stream, data|
+          arch = '64' if data.strip == "x86_64"
+        end
+        
+        puts "    passenger version #{version} configured for #{arch}"
+
+        passenger_config =<<-EOF
+          LoadModule passenger_module /usr/lib#{arch}/ruby/gems/1.8/gems/passenger-#{version}/ext/apache2/mod_passenger.so
+          PassengerRoot /usr/lib#{arch}/ruby/gems/1.8/gems/passenger-#{version}
+          PassengerRuby #{rubypath}
+        EOF
+        
+        # make the conf
+        put passenger_config, "#{shared_path}/passenger.conf"
+        send(run_method, "cp #{shared_path}/passenger.conf /etc/httpd/conf/passenger.conf")
+        send(run_method, "rm -f #{shared_path}/passenger.conf")
+
+        # include in apache
+        sudo("chmod 666 /etc/httpd/conf/httpd.conf")
+        sudo("[  -z \"`grep 'Include conf/passenger.conf' /etc/httpd/conf/httpd.conf`\" ] && echo 'Include conf/passenger.conf' >> /etc/httpd/conf/httpd.conf || echo 'Passenger module already included.'")
+        sudo("chmod 644 /etc/httpd/conf/httpd.conf")
+      
+      end
+  end
+  
   on      :start, :require_recipes
   before  'deploy:update_code', 'app:symlinks:setup'
   after   'deploy:symlink', 'app:symlinks:update'
