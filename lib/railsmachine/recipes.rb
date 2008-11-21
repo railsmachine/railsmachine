@@ -212,23 +212,19 @@ Capistrano::Configuration.instance(:must_exist).load do
   namespace :install do
     desc "Install Phusion Passenger"
       task :passenger, :roles => :web do
-        intall_gcc_compiler
+        install_passenger_dependencies
         install_passenger_module
         config_passenger
       end
 
-      task :intall_gcc_compiler, :roles => :web do
-        sudo "yum install gcc-c++ -y"
-      end  
+      task :install_passenger_dependencies, :roles => :web do
+        sudo "yum install gcc-c++ httpd-devel -y"
+        sudo "gem install rack --no-ri --no-rdoc"
+      end
 
       task :install_passenger_module, :roles => :web do
         sudo "gem install passenger --no-ri --no-rdoc"
-        input = ''
-        run "sudo passenger-install-apache2-module" do |ch,stream,out|
-          next if out.chomp == input.chomp || out.chomp == ''
-          print out
-          ch.send_data(input = $stdin.gets) if out =~ /(Enter|ENTER)/
-        end
+        run "yes | sudo passenger-install-apache2-module"
       end
 
       task :config_passenger, :roles => :web do
