@@ -22,6 +22,14 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :configure, :roles => :web do
       set_apache_conf
       
+      run("[ -f #{apache_conf} ] && echo \"yes\" || echo \"no\"") do |c, s, o|
+        if o =~ /yes?/
+          backup = "#{apache_conf}.old.#{Time.now.strftime('%Y%m%d%H%M%S')}"
+          exit if Capistrano::CLI.ui.ask("WARNING: You are about to change your existing Apache configuration. A backup will be kept at #{backup}. Are you sure you want to proceed? [y/N]").upcase != "Y"
+          send(run_method, "mv #{apache_conf} #{backup}")
+        end
+      end
+      
       server_aliases = []
       server_aliases << "www.#{apache_server_name}"
       server_aliases.concat apache_server_aliases
