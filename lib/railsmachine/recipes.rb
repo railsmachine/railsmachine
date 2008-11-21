@@ -247,15 +247,15 @@ Capistrano::Configuration.instance(:must_exist).load do
         puts "    passenger version #{version} configured for #{arch}"
 
         passenger_config =<<-EOF
-          LoadModule passenger_module /usr/lib#{arch}/ruby/gems/1.8/gems/passenger-#{version}/ext/apache2/mod_passenger.so
-          PassengerRoot /usr/lib#{arch}/ruby/gems/1.8/gems/passenger-#{version}
-          PassengerRuby #{rubypath}
+LoadModule passenger_module /usr/lib#{arch}/ruby/gems/1.8/gems/passenger-#{version}/ext/apache2/mod_passenger.so
+PassengerRoot /usr/lib#{arch}/ruby/gems/1.8/gems/passenger-#{version}
+PassengerRuby #{rubypath}
         EOF
         
         # make the conf
-        put passenger_config, "#{shared_path}/passenger.conf"
-        send(run_method, "cp #{shared_path}/passenger.conf /etc/httpd/conf/passenger.conf")
-        send(run_method, "rm -f #{shared_path}/passenger.conf")
+        put passenger_config, "/tmp/passenger.conf"
+        send(run_method, "cp /tmp/passenger.conf /etc/httpd/conf/passenger.conf")
+        send(run_method, "rm -f /tmp/passenger.conf")
 
         # include in apache
         sudo("chmod 666 /etc/httpd/conf/httpd.conf")
