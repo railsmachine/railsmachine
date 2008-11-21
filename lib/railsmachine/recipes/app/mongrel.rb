@@ -118,7 +118,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
   
   def set_mongrel_conf
-    set :mongrel_conf, "/etc/mongrel_cluster/#{application}.yml" unless mongrel_conf
+    set :mongrel_conf, "/etc/mongrel_cluster/#{application}.conf" unless mongrel_conf
   end
 
   def set_mongrel_pid_file
