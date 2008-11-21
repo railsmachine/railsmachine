@@ -176,6 +176,39 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   end
   
+  namespace :mongrel do
+    namespace :cluster do  
+      desc "Stop the mongrel cluster."
+      task :stop, :roles => :app do 
+        stop_mongrel
+      end
+      
+      desc "Start the mongrel cluster."
+      task :start, :roles => :app do 
+        start_mongrel
+      end
+      
+      desc "Restart the mongrel cluster."
+      task :restart, :roles => :app do 
+        restart_mongrel
+      end
+      
+      desc "Remove the mongrel cluster configuration."
+      task :remove, :roles => :app do 
+        set_mongrel_conf
+        
+        run("[ -f #{mongrel_conf} ] && echo \"yes\" || echo \"no\"") do |c, s, o|
+          if o =~ /yes?/
+            exit if Capistrano::CLI.ui.ask("WARNING: You are about to remove your mongrel cluster configuration. Are you sure you want to proceed? [y/N]").upcase != "Y"
+            mongrel.cluster.stop
+            send(run_method, "rm #{mongrel_conf}")
+          end
+        end
+        
+      end
+    end
+  end
+  
   on      :start, :require_recipes
   before  'deploy:update_code', 'app:symlinks:setup'
   after   'deploy:symlink', 'app:symlinks:update'
