@@ -196,12 +196,13 @@ Capistrano::Configuration.instance(:must_exist).load do
       desc "Remove the mongrel cluster configuration."
       task :remove, :roles => :app do 
         set_mongrel_conf
-        
-        run("[ -f #{mongrel_conf} ] && echo \"yes\" || echo \"no\"") do |c, s, o|
+        alt_mongrel_conf = mongrel_conf.gsub('.conf','.yml')
+        run("[ -f #{mongrel_conf} ] || [ -f #{alt_mongrel_conf} ] && echo \"yes\" || echo \"no\"") do |c, s, o|
           if o =~ /yes?/
             exit if Capistrano::CLI.ui.ask("WARNING: You are about to remove your mongrel cluster configuration. Are you sure you want to proceed? [y/N]").upcase != "Y"
             mongrel.cluster.stop
-            send(run_method, "rm #{mongrel_conf}")
+            send(run_method, "[ -f #{mongrel_conf} ] && rm #{mongrel_conf}")
+            send(run_method, "[ -f #{alt_mongrel_conf} ] && rm #{alt_mongrel_conf}")
           end
         end
         
