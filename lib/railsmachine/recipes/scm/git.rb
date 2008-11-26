@@ -7,7 +7,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :setup, :roles => :scm do
       dir =  "#{deploy_to}/repos"
       run   "mkdir -p #{dir}"
-      sudo  "chown -R deploy:deploy #{dir}"
+      sudo  "chown -R #{user}:#{user} #{dir}"
       run   "cd #{dir} && git --bare init"
       run   "chmod 770 #{dir}"
     end

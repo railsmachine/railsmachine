@@ -53,6 +53,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     Used to configure your deployment environment in one command.
     DESC
     task :setup  do
+      sudo  "chown -R #{user}:#{user} #{deploy_to.gsub(application,'')}"
       deploy.setup
     begin
       db.setup
@@ -167,6 +168,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc "Setup source control repository."
     task :setup, :roles => :scm  do
     begin
+      sudo  "chown -R #{user}:#{user} #{deploy_to.gsub(application,'')}"
       localrepo.setup
     rescue
       puts "repos:setup failed!"

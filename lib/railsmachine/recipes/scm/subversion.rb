@@ -7,6 +7,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :setup, :roles => :scm do
      dir = "#{deploy_to}/repos"
      run "mkdir -p #{dir}"
+     sudo  "chown -R #{user}:#{user} #{dir}"
      run "chmod 770 #{dir}"
      run "svnadmin create #{dir}"
     end
