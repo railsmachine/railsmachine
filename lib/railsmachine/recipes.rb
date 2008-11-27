@@ -138,7 +138,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     
     desc "Setup web server."
     task :setup, :roles => :web  do
-      set :apache_server_name, domain unless apache_server_name
+      set :httpd_server_name, domain unless httpd_server_name
       apache.configure
     end
     
