@@ -76,40 +76,40 @@ Capistrano::Configuration.instance(:must_exist).load do
   
     desc 'Setup mongrel'
     task :setup, :roles => :app  do
-      as = fetch(:app_server)
-      if as == :mongrel
+      case app_server.to_s
+       when "mongrel"
         setup_mongrel
-      elsif as == :passenger
+       when "passenger"
         setup_passenger
       end
     end
     
     desc "Restart application server."
     task :restart, :roles => :app  do
-      as = fetch(:app_server)
-      if as == :mongrel
+      case app_server.to_s
+       when "mongrel"
         restart_mongrel
-      elsif as == :passenger
+       when "passenger"
         restart_passenger
       end
     end
     
     desc "Start application server."
     task :start, :roles => :app  do
-      as = fetch(:app_server)
-      if as == :mongrel
+      case app_server.to_s
+       when "mongrel"
         start_mongrel
-      elsif as == :passenger
+       when "passenger"
         start_passenger
       end
     end
     
     desc "Stop application server."
     task :stop, :roles => :app  do
-      as = fetch(:app_server)
-      if as == :mongrel
+      case app_server.to_s
+       when "mongrel"
         stop_mongrel
-      elsif as == :passenger
+       when "passenger"
         stop_passenger
       end
     end
