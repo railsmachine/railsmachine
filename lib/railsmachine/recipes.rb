@@ -275,11 +275,6 @@ PassengerRuby #{rubypath}
   after   :deploy,'deploy:cleanup'
   
   def setup_mongrel
-    set :mongrel_environment, rails_env
-    set :mongrel_port, apache_proxy_port
-    set :mongrel_servers, apache_proxy_servers
-    set :mongrel_user, user unless mongrel_user
-    set :mongrel_group, mongrel_user unless mongrel_group
     set_mongrel_conf
     mongrel.cluster.configure
   end

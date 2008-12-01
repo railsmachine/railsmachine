@@ -13,6 +13,8 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :mongrel_log_file, nil
   set :mongrel_config_script, nil
  
+  load    'config/deploy'
+ 
   namespace :mongrel do
   
     namespace :cluster do
