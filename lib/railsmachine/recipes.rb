@@ -247,13 +247,11 @@ Capistrano::Configuration.instance(:must_exist).load do
           arch = '64' if data.strip == "x86_64"
         end
         
-        puts "    passenger version #{version} configured for #{arch}"
-
-        passenger_config =<<-EOF
-LoadModule passenger_module /usr/lib#{arch}/ruby/gems/1.8/gems/passenger-#{version}/ext/apache2/mod_passenger.so
-PassengerRoot /usr/lib#{arch}/ruby/gems/1.8/gems/passenger-#{version}
-PassengerRuby #{rubypath}
-        EOF
+        puts "    passenger version #{version} configured for #{arch}"        
+        
+        file = File.join(File.dirname(__FILE__), "recipes", "web", "templates", "passenger", "passenger.conf")
+        template = File.read(file)
+        passenger_config = ERB.new(template).result(binding)
         
         # make the conf
         put passenger_config, "/tmp/passenger.conf"
