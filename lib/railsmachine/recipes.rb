@@ -213,8 +213,8 @@ Capistrano::Configuration.instance(:must_exist).load do
           if o =~ /yes?/
             exit if Capistrano::CLI.ui.ask("WARNING: You are about to remove your mongrel cluster configuration. Are you sure you want to proceed? [y/N]").upcase != "Y"
             mongrel.cluster.stop
-            send(run_method, "[ -f #{mongrel_conf} ] && rm #{mongrel_conf}")
-            send(run_method, "[ -f #{alt_mongrel_conf} ] && rm #{alt_mongrel_conf}")
+            sudo("rm -f #{mongrel_conf}")
+            sudo("rm -f #{alt_mongrel_conf}")
           end
         end
         
