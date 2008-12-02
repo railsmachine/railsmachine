@@ -113,6 +113,16 @@ Capistrano::Configuration.instance(:must_exist).load do
         stop_passenger
       end
     end
+    
+    desc "Switch your application to run on mongrel or passenger."
+    task :switch do
+      case app_server.to_s
+       when "mongrel"
+         switch_to_mongrel
+       when "passenger"
+         switch_to_passenger
+      end
+    end
   
     namespace :symlinks do
   
@@ -308,6 +318,29 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   def stop_passenger
     passenger.stop
+  end
+  
+  def switch_to_mongrel
+    app.setup 
+    app.start 
+    web.restart
+  end
+  
+  def switch_to_passenger
+    version = 'ERROR'
+    run("gem list | grep passenger") do |ch, stream, data|
+     version = data.sub(/passenger \(([^),]+).*/,"\\1").strip
+    end
+
+    install.passenger if version == 'ERROR'
+
+    web.setup 
+    mongrel.cluster.remove 
+    web.restart
+  end
+  
+  def set_mongrel_conf
+    set :mongrel_conf, "/etc/mongrel_cluster/#{application}.conf" unless exists? :mongrel_conf
   end
 
   def invalid_variable_value(value, name, valid_options)
