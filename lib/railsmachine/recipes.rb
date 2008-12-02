@@ -328,10 +328,10 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   def switch_to_passenger
     version = 'ERROR'
-    run("gem list | grep passenger") do |ch, stream, data|
-     version = data.sub(/passenger \(([^),]+).*/,"\\1").strip
+    run("gem list | grep passenger || echo 'ERROR'") do |ch, stream, data|
+     version = data.strip
     end
-
+    
     install.passenger if version == 'ERROR'
 
     web.setup 
