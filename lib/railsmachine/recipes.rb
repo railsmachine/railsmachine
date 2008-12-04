@@ -306,6 +306,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     set :pasenger_environment, rails_env
     set :passenger_user, user unless passenger_user
     set :passenger_group, passenger_user unless passenger_group
+    install_passenger
   end
 
   def restart_passenger
@@ -327,16 +328,20 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
   
   def switch_to_passenger
-    version = 'ERROR'
-    run("gem list | grep passenger || echo 'ERROR'") do |ch, stream, data|
-     version = data.strip
-    end
-    
-    install.passenger if version == 'ERROR'
+    install_passenger
 
     web.setup 
     mongrel.cluster.remove 
     web.restart
+  end
+  
+  def install_passenger
+    version = 'ERROR'
+    run("gem list | grep passenger || echo 'ERROR'") do |ch, stream, data|
+    version = data.strip
+  end
+    
+    install.passenger if version == 'ERROR'
   end
   
   def set_mongrel_conf
