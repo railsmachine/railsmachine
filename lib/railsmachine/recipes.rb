@@ -324,6 +324,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   def switch_to_mongrel
     app.setup 
     app.start 
+    web.setup
     web.restart
   end
   
