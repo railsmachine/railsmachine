@@ -284,6 +284,11 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   def setup_mongrel
     set_mongrel_conf
+    set :mongrel_environment, rails_env
+    set :mongrel_port, httpd_proxy_port
+    set :mongrel_servers, httpd_proxy_servers
+    set :mongrel_user, user unless mongrel_user
+    set :mongrel_group, mongrel_user unless mongrel_group
     mongrel.cluster.configure
   end
 
