@@ -37,10 +37,14 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
 
   before :require_recipes, :validate_required_variables
+  
+  require "railsmachine/recipes/app/deploy"
+  require "railsmachine/recipes/app/mongrel"
+  require "railsmachine/recipes/app/passenger"
+  require "railsmachine/recipes/install/passenger"
 
   # defer requires until variables have been set
   task :require_recipes do
-    require "railsmachine/recipes/app/#{app_server}"
     require "railsmachine/recipes/scm/#{scm}"
     require "railsmachine/recipes/web/#{httpd}"
     require "railsmachine/recipes/db/#{db_adapter}"
@@ -74,7 +78,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   namespace :app do
   
-    desc 'Setup mongrel'
+    desc "Setup #{app_server}"
     task :setup, :roles => :app  do
       case app_server.to_s
        when "mongrel"
@@ -188,94 +192,6 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   end
   
-  namespace :mongrel do
-    namespace :cluster do  
-      desc "Stop the mongrel cluster."
-      task :stop, :roles => :app do 
-        stop_mongrel
-      end
-      
-      desc "Start the mongrel cluster."
-      task :start, :roles => :app do 
-        start_mongrel
-      end
-      
-      desc "Restart the mongrel cluster."
-      task :restart, :roles => :app do 
-        restart_mongrel
-      end
-      
-      desc "Remove the mongrel cluster configuration."
-      task :remove, :roles => :app do 
-        set_mongrel_conf
-        alt_mongrel_conf = mongrel_conf.gsub('.conf','.yml')
-        run("[ -f #{mongrel_conf} ] || [ -f #{alt_mongrel_conf} ] && echo \"yes\" || echo \"no\"") do |c, s, o|
-          if o =~ /yes?/
-            exit if Capistrano::CLI.ui.ask("WARNING: You are about to remove your mongrel cluster configuration. Are you sure you want to proceed? [y/N]").upcase != "Y"
-            mongrel.cluster.stop
-            sudo("rm -f #{mongrel_conf}")
-            sudo("rm -f #{alt_mongrel_conf}")
-          end
-        end
-        
-      end
-    end
-  end
-  
-  namespace :install do
-    desc "Install Phusion Passenger"
-      task :passenger, :roles => :web do
-        install_passenger_dependencies
-        install_passenger_module
-        config_passenger
-      end
-
-      task :install_passenger_dependencies, :roles => :web do
-        sudo "yum install gcc-c++ httpd-devel -y"
-        sudo "gem install rack --no-ri --no-rdoc"
-      end
-
-      task :install_passenger_module, :roles => :web do
-        sudo "gem install passenger --no-ri --no-rdoc"
-        run "yes | sudo passenger-install-apache2-module"
-      end
-
-      task :config_passenger, :roles => :web do
-        version = 'ERROR'
-        arch = ''
-        rubypath = '/usr/bin/ruby'
-        
-        run("gem list | grep passenger") do |ch, stream, data|
-          version = data.sub(/passenger \(([^),]+).*/,"\\1").strip
-        end
-        
-        run("which ruby") do |ch, stream, data|
-          rubypath = data.strip
-        end
-        
-        run("uname -i") do |ch, stream, data|
-          arch = '64' if data.strip == "x86_64"
-        end
-        
-        puts "    passenger version #{version} configured for #{arch}"        
-        
-        file = File.join(File.dirname(__FILE__), "recipes", "web", "templates", "passenger", "passenger.conf")
-        template = File.read(file)
-        passenger_config = ERB.new(template).result(binding)
-        
-        # make the conf
-        put passenger_config, "/tmp/passenger.conf"
-        send(run_method, "cp /tmp/passenger.conf /etc/httpd/conf/passenger.conf")
-        send(run_method, "rm -f /tmp/passenger.conf")
-
-        # include in apache
-        sudo("chmod 666 /etc/httpd/conf/httpd.conf")
-        sudo("[  -z \"`grep 'Include conf/passenger.conf' /etc/httpd/conf/httpd.conf`\" ] && echo 'Include conf/passenger.conf' >> /etc/httpd/conf/httpd.conf || echo 'Passenger module already included.'")
-        sudo("chmod 644 /etc/httpd/conf/httpd.conf")
-      
-      end
-  end
-  
   on      :start, :require_recipes
   before  'deploy:update_code', 'app:symlinks:setup'
   after   'deploy:symlink', 'app:symlinks:update'
@@ -293,19 +209,16 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
 
   def restart_mongrel
-    require "railsmachine/recipes/app/mongrel"
     set_mongrel_conf
     mongrel.cluster.restart
   end
   
   def start_mongrel
-    require "railsmachine/recipes/app/mongrel"
     set_mongrel_conf
     mongrel.cluster.start
   end
 
   def stop_mongrel
-    require "railsmachine/recipes/app/mongrel"
     set_mongrel_conf
     mongrel.cluster.stop
   end
@@ -344,17 +257,17 @@ Capistrano::Configuration.instance(:must_exist).load do
     web.restart
   end
   
-  def install_passenger
+  def switch_to_passenger
     version = 'ERROR'
     run("gem list | grep passenger || echo 'ERROR'") do |ch, stream, data|
-    version = data.strip
-  end
+     version = data.strip
+    end
     
     install.passenger if version == 'ERROR'
-  end
-  
-  def set_mongrel_conf
-    set :mongrel_conf, "/etc/mongrel_cluster/#{application}.conf" unless exists? :mongrel_conf
+
+    web.setup 
+    mongrel.cluster.remove 
+    web.restart
   end
 
   def invalid_variable_value(value, name, valid_options)

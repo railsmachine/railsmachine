@@ -89,34 +89,23 @@ Capistrano::Configuration.instance(:must_exist).load do
         set_mongrel_conf
         send(run_method, "#{mongrel_rails} cluster::status -C #{mongrel_conf}")
       end
+      
+      desc "Remove the mongrel cluster configuration."
+      task :remove, :roles => :app do 
+        set_mongrel_conf
+        alt_mongrel_conf = mongrel_conf.gsub('.conf','.yml')
+        run("[ -f #{mongrel_conf} ] || [ -f #{alt_mongrel_conf} ] && echo \"yes\" || echo \"no\"") do |c, s, o|
+          if o =~ /yes?/
+            exit if Capistrano::CLI.ui.ask("WARNING: You are about to remove your mongrel cluster configuration. Are you sure you want to proceed? [y/N]").upcase != "Y"
+            mongrel.cluster.stop
+            sudo("rm -f #{mongrel_conf}")
+            sudo("rm -f #{alt_mongrel_conf}")
+          end
+        end
+      end
   
     end
     
-  end
-
-  namespace :deploy do
-    
-    desc <<-DESC
-    Start the Mongrel processes on the app server by calling start_mongrel_cluster.
-    DESC
-    task :start, :roles => :app do
-      mongrel.cluster.start
-    end
-  
-    desc <<-DESC
-    Restart the Mongrel processes on the app server by calling restart_mongrel_cluster.
-    DESC
-    task :restart, :roles => :app do
-      mongrel.cluster.restart
-    end
-  
-    desc <<-DESC
-    Stop the Mongrel processes on the app server by calling stop_mongrel_cluster.
-    DESC
-    task :stop, :roles => :app do
-      mongrel.cluster.stop
-    end
-  
   end
   
   def set_mongrel_conf

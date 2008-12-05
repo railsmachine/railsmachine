@@ -3,6 +3,8 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :passenger_user, nil
   set :passenger_group, nil
   set :use_mod_rewrite, false
+  
+  load    'config/deploy'
  
   namespace :passenger do
 
@@ -20,31 +22,6 @@ Capistrano::Configuration.instance(:must_exist).load do
       run "touch #{current_path}/tmp/restart.txt"
     end
 
-  end
-
-  namespace :deploy do
-    
-    desc <<-DESC
-    This has no effect when using passenger.
-    DESC
-    task :start, :roles => :app do
-      passenger.start
-    end
-  
-    desc <<-DESC
-    Restart passenger.
-    DESC
-    task :restart, :roles => :app do
-      passenger.restart
-    end
-  
-    desc <<-DESC
-    This has no effect when using passenger.
-    DESC
-    task :stop, :roles => :app do
-      passenger.stop
-    end
-  
   end
   
 end
