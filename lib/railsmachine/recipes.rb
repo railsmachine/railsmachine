@@ -293,16 +293,19 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
 
   def restart_mongrel
+    require "railsmachine/recipes/app/mongrel"
     set_mongrel_conf
     mongrel.cluster.restart
   end
   
   def start_mongrel
+    require "railsmachine/recipes/app/mongrel"
     set_mongrel_conf
     mongrel.cluster.start
   end
 
   def stop_mongrel
+    require "railsmachine/recipes/app/mongrel"
     set_mongrel_conf
     mongrel.cluster.stop
   end
