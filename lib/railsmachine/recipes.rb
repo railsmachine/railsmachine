@@ -41,8 +41,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   require "railsmachine/recipes/app/deploy"
   require "railsmachine/recipes/app/mongrel"
   require "railsmachine/recipes/app/passenger"
-  require "railsmachine/recipes/install/passenger"
-
+  
   # defer requires until variables have been set
   task :require_recipes do
     require "railsmachine/recipes/scm/#{scm}"
@@ -227,7 +226,6 @@ Capistrano::Configuration.instance(:must_exist).load do
     set :pasenger_environment, rails_env
     set :passenger_user, user unless passenger_user
     set :passenger_group, passenger_user unless passenger_group
-    install_passenger
   end
 
   def restart_passenger
@@ -250,21 +248,6 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
   
   def switch_to_passenger
-    install_passenger
-
-    web.setup 
-    mongrel.cluster.remove 
-    web.restart
-  end
-  
-  def install_passenger
-    version = 'ERROR'
-    run("gem list | grep passenger || echo 'ERROR'") do |ch, stream, data|
-     version = data.strip
-    end
-    
-    install.passenger if version == 'ERROR'
-
     web.setup 
     mongrel.cluster.remove 
     web.restart
