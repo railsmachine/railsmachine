@@ -17,7 +17,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     if scm == :subversion
       "svn+ssh://#{repos_base}/repos/trunk"
     elsif scm == :git
-      "ssh://#{repos_base}/repos/#{application}.git"
+      "ssh://#{repos_base}/repos"
     end
   end
 
