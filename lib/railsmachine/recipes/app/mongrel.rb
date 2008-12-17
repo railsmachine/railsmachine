@@ -90,7 +90,9 @@ Capistrano::Configuration.instance(:must_exist).load do
         send(run_method, "#{mongrel_rails} cluster::status -C #{mongrel_conf}")
       end
       
-      desc "Remove the mongrel cluster configuration."
+      desc <<-DESC
+      Remove the mongrel cluster configuration from the app server.
+      DESC
       task :remove, :roles => :app do 
         set_mongrel_conf
         alt_mongrel_conf = mongrel_conf.gsub('.conf','.yml')

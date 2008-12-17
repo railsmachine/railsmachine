@@ -8,7 +8,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :valid_scms, [:subversion, :git]
 
   set :httpd, :apache
-  set :valid_httpds, [:apache, :nginx]
+  set :valid_httpds, [:apache]
 
   set :app_server, :mongrel
   set :valid_app_servers, [:mongrel, :passenger]
@@ -67,7 +67,9 @@ Capistrano::Configuration.instance(:must_exist).load do
       web.setup
     end
   
-    desc "A macro task that restarts the application and web servers"
+    desc <<-DESC
+    A macro task that restarts the application and web servers
+    DESC
     task :restart do
       app.restart
       web.restart
@@ -77,47 +79,42 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   namespace :app do
   
-    desc "Setup #{app_server}"
+    desc <<-DESC
+    Setup #{app_server}
+    DESC
     task :setup, :roles => :app  do
       case app_server.to_s
        when "mongrel"
         setup_mongrel
        when "passenger"
-        setup_passenger
+        # do nothing
       end
     end
     
-    desc "Restart application server."
+    desc <<-DESC
+    Restart application server.
+    DESC
     task :restart, :roles => :app  do
-      case app_server.to_s
-       when "mongrel"
-        restart_mongrel
-       when "passenger"
-        restart_passenger
-      end
+      application_servlet.restart
     end
     
-    desc "Start application server."
+    desc <<-DESC
+    Start application server.
+    DESC
     task :start, :roles => :app  do
-      case app_server.to_s
-       when "mongrel"
-        start_mongrel
-       when "passenger"
-        start_passenger
-      end
+      application_servlet.start
     end
     
-    desc "Stop application server."
+    desc <<-DESC
+    Stop application server.
+    DESC
     task :stop, :roles => :app  do
-      case app_server.to_s
-       when "mongrel"
-        stop_mongrel
-       when "passenger"
-        stop_passenger
-      end
+      application_servlet.stop
     end
     
-    desc "Switch your application to run on mongrel or passenger."
+    desc <<-DESC
+    Switch your application to run on mongrel or passenger.
+    DESC
     task :switch do
       case app_server.to_s
        when "mongrel"
@@ -129,14 +126,18 @@ Capistrano::Configuration.instance(:must_exist).load do
   
     namespace :symlinks do
   
-      desc "Setup application symlinks in the public"
+      desc <<-DESC
+      Setup application symlinks in the public
+      DESC
       task :setup, :roles => [:app, :web] do
         if app_symlinks
           app_symlinks.each { |link| run "mkdir -p #{shared_path}/public/#{link}" }
         end
       end
 
-      desc "Link public directories to shared location."
+      desc <<-DESC
+      Link public directories to shared location.
+      DESC
       task :update, :roles => [:app, :web] do
         if app_symlinks
           app_symlinks.each { |link| run "ln -nfs #{shared_path}/public/#{link} #{current_path}/public/#{link}" }
@@ -149,28 +150,38 @@ Capistrano::Configuration.instance(:must_exist).load do
   
   namespace :web do
     
-    desc "Setup web server."
+    desc <<-DESC
+    Setup web server.
+    DESC
     task :setup, :roles => :web  do
-      set : apache_server_name, domain unless  apache_server_name
+      set :apache_server_name, domain unless  apache_server_name
       apache.configure
     end
     
-    desc "Restart web server."
+    desc <<-DESC
+    Restart web server.
+    DESC
     task :restart, :roles => :web  do
       apache.restart
     end
     
-    desc "Reload web server configuration."
+    desc <<-DESC
+    Reload web server configuration.
+    DESC
     task :reload, :roles => :web  do
       apache.reload
     end
     
-    desc "Start web server."
+    desc <<-DESC
+    Start web server.
+    DESC
     task :start, :roles => :web  do
       apache.start
     end
     
-    desc "Stop web server."
+    desc <<-DESC
+    Stop web server.
+    DESC
     task :stop, :roles => :web  do
       apache.stop
     end  
@@ -178,7 +189,9 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
   
   namespace :repos do
-    desc "Setup source control repository."
+    desc <<-DESC
+    Setup source control repository.
+    DESC
     task :setup, :roles => :scm  do
     begin
       sudo  "chown -R #{user}:#{user} #{deploy_to.gsub(application,'')}"
@@ -207,39 +220,6 @@ Capistrano::Configuration.instance(:must_exist).load do
     mongrel.cluster.configure
   end
 
-  def restart_mongrel
-    set_mongrel_conf
-    mongrel.cluster.restart
-  end
-  
-  def start_mongrel
-    set_mongrel_conf
-    mongrel.cluster.start
-  end
-
-  def stop_mongrel
-    set_mongrel_conf
-    mongrel.cluster.stop
-  end
-
-  def setup_passenger
-    set :pasenger_environment, rails_env
-    set :passenger_user, user unless passenger_user
-    set :passenger_group, passenger_user unless passenger_group
-  end
-
-  def restart_passenger
-    passenger.restart
-  end
-  
-  def start_passenger
-    passenger.start
-  end
-
-  def stop_passenger
-    passenger.stop
-  end
-  
   def switch_to_mongrel
     app.setup 
     app.start 
@@ -252,7 +232,16 @@ Capistrano::Configuration.instance(:must_exist).load do
     mongrel.cluster.remove 
     web.restart
   end
-
+  
+  def application_servlet
+    case app_server.to_s
+      when 'mongrel' 
+        mongrel.cluster
+      when 'passenger' 
+        passenger
+    end 
+  end
+  
   def invalid_variable_value(value, name, valid_options)
     error_msg("'#{value}' is not a valid :#{name}.  Please set :#{name} to one of the following: #{valid_options.join(", ")}")
   end

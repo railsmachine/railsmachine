@@ -57,19 +57,19 @@ role :scm, domain
 # =============================================================================
 # WEB SERVER OPTIONS
 # =============================================================================
-# set :httpd, "apache"   # apache or nginx
-# set : apache_server_name, domain
-# set : apache_server_aliases, %w{alias1 alias2}
-# set : apache_default_vhost, true # force use of  apache_default_vhost_config
-# set : apache_default_vhost_conf, "/etc/httpd/conf/default.conf"
-# set : apache_conf, "/etc/httpd/conf/apps/#{application}.conf"
-# set : apache_proxy_port, 8000
-# set : apache_proxy_servers, 2
-# set : apache_proxy_address, "127.0.0.1"
-# set : apache_ssl_enabled, false
-# set : apache_ssl_ip, "127.0.0.1"
-# set : apache_ssl_forward_all, false
-# set : apache_ctl, "/etc/init.d/httpd"
+# set :httpd, "apache"   # apache 
+# set :apache_server_name, domain
+# set :apache_server_aliases, %w{alias1 alias2}
+# set :apache_default_vhost, true # force use of  apache_default_vhost_config
+# set :apache_default_vhost_conf, "/etc/httpd/conf/default.conf"
+# set :apache_conf, "/etc/httpd/conf/apps/#{application}.conf"
+# set :apache_proxy_port, 8000
+# set :apache_proxy_servers, 2
+# set :apache_proxy_address, "127.0.0.1"
+# set :apache_ssl_enabled, false
+# set :apache_ssl_ip, "127.0.0.1"
+# set :apache_ssl_forward_all, false
+# set :apache_ctl, "/etc/init.d/httpd"
 
 
 
@@ -93,7 +93,7 @@ role :scm, domain
 # =============================================================================
 # SCM OPTIONS
 # =============================================================================
-# set :scm, :subversion
+# set :scm, :subversion    # :subversion or :git
 set :repository, scm == :subversion ? "svn+ssh://#{user}@#{domain}#{deploy_to}/repos/trunk" : "ssh://#{user}@#{domain}#{deploy_to}/repos"
 
 # =============================================================================

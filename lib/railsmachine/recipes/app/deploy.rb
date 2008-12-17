@@ -6,21 +6,21 @@ Capistrano::Configuration.instance(:must_exist).load do
     #{app_server.to_s == 'mongrel' ? "Start the mongrel processes on the app server." : "This task no effect when using Passenger as your application server."}
     DESC
     task :start, :roles => :app do
-      app_server.to_s == 'mongrel' ? mongrel.cluster.start : passenger.start
+      application_servlet.start
     end
 
     desc <<-DESC
     Restart the #{app_server} processes on the app server.
     DESC
     task :restart, :roles => :app do
-      app_server.to_s == 'mongrel' ? mongrel.cluster.restart : passenger.restart
+      application_servlet.restart
     end
 
     desc <<-DESC
     #{app_server.to_s == 'mongrel' ? "Stop the mongrel processes on the app server." : "This task no effect when using Passenger as your application server."} 
     DESC
     task :stop, :roles => :app do
-      app_server.to_s == 'mongrel' ? mongrel.cluster.stop : passenger.stop
+      application_servlet.stop
     end
 
   end
