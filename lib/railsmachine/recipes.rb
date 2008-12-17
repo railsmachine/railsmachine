@@ -3,19 +3,10 @@ Capistrano::Configuration.instance(:must_exist).load do
   default_run_options[:pty] = true
   set :keep_releases, 3
   set :app_symlinks, nil
-
   set :scm, :subversion
-  set :valid_scms, [:subversion, :git]
-
   set :httpd, :apache
-  set :valid_httpds, [:apache]
-
   set :app_server, :mongrel
-  set :valid_app_servers, [:mongrel, :passenger]
-
   set :db_adapter, :mysql
-  set :valid_db_adapters, [:mysql, :postgresql, :sqlite3]
-
   set :rails_env, "production"
 
   load    'config/deploy'
