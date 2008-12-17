@@ -18,6 +18,8 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   set :rails_env, "production"
 
+  load    'config/deploy'
+  
   set :repository do
     scm = fetch(:scm)
     repos_base = "#{user}@#{domain}#{deploy_to}"
@@ -30,10 +32,10 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   
   task :validate_required_variables do
-    raise ArgumentError, invalid_variable_value(scm, "scm", valid_scms) unless valid?(scm, valid_scms)
-    raise ArgumentError, invalid_variable_value(app_server, "app_server", valid_app_servers) unless valid?(app_server, valid_app_servers)
-    raise ArgumentError, invalid_variable_value(httpd, "httpd", valid_httpds) unless valid?(httpd, valid_httpds)
-    raise ArgumentError, invalid_variable_value(db_adapter, "db_adapter", valid_db_adapters) unless valid?(db_adapter, valid_db_adapters)
+    validate_option(:scm, :in => [:subversion, :git])
+    validate_option(:app_server, :in => [:mongrel, :passenger])
+    validate_option(:httpd, :in => [:apache])
+    validate_option(:db_adapter, :in => [:mysql, :postgresql, :sqlite3])  
   end
 
   before :require_recipes, :validate_required_variables
@@ -233,6 +235,12 @@ Capistrano::Configuration.instance(:must_exist).load do
     web.restart
   end
   
+  def validate_option(key, options = {})
+    if !(options[:in].map{|o| o.to_s } + ['']).include?(self[key].to_s)
+      raise(ArgumentError, error_msg("Invalid value '#{self[key]}' for option '#{key}' must be one of the following: '#{options[:in].join(', ')}'"))
+    end
+  end
+
   def application_servlet
     case app_server.to_s
       when 'mongrel' 
@@ -241,17 +249,10 @@ Capistrano::Configuration.instance(:must_exist).load do
         passenger
     end 
   end
-  
-  def invalid_variable_value(value, name, valid_options)
-    error_msg("'#{value}' is not a valid :#{name}.  Please set :#{name} to one of the following: #{valid_options.join(", ")}")
-  end
 
   def error_msg(msg)
     banner = ''; msg.length.times { banner << "+" }
     return "\n\n#{banner}\n#{msg}\n#{banner}\n\n"
   end
-
-  def valid?(value, collection)
-    collection.collect { |i| i.to_s }.include? value.to_s
-  end
+  
 end

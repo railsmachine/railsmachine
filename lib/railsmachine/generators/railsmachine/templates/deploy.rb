@@ -94,7 +94,6 @@ role :scm, domain
 # SCM OPTIONS
 # =============================================================================
 # set :scm, :subversion    # :subversion or :git
-set :repository, scm == :subversion ? "svn+ssh://#{user}@#{domain}#{deploy_to}/repos/trunk" : "ssh://#{user}@#{domain}#{deploy_to}/repos"
 
 # =============================================================================
 # SSH OPTIONS
