@@ -58,27 +58,27 @@ role :scm, domain
 # WEB SERVER OPTIONS
 # =============================================================================
 # set :httpd, "apache"   # apache or nginx
-# set :httpd_server_name, domain
-# set :httpd_server_aliases, %w{alias1 alias2}
-# set :httpd_default_vhost, true # force use of httpd_default_vhost_config
-# set :httpd_default_vhost_conf, "/etc/httpd/conf/default.conf"
-# set :httpd_conf, "/etc/httpd/conf/apps/#{application}.conf"
-# set :httpd_proxy_port, 8000
-# set :httpd_proxy_servers, 2
-# set :httpd_proxy_address, "127.0.0.1"
-# set :httpd_ssl_enabled, false
-# set :httpd_ssl_ip, "127.0.0.1"
-# set :httpd_ssl_forward_all, false
-# set :httpd_ctl, "/etc/init.d/httpd"
+# set : apache_server_name, domain
+# set : apache_server_aliases, %w{alias1 alias2}
+# set : apache_default_vhost, true # force use of  apache_default_vhost_config
+# set : apache_default_vhost_conf, "/etc/httpd/conf/default.conf"
+# set : apache_conf, "/etc/httpd/conf/apps/#{application}.conf"
+# set : apache_proxy_port, 8000
+# set : apache_proxy_servers, 2
+# set : apache_proxy_address, "127.0.0.1"
+# set : apache_ssl_enabled, false
+# set : apache_ssl_ip, "127.0.0.1"
+# set : apache_ssl_forward_all, false
+# set : apache_ctl, "/etc/init.d/httpd"
 
 
 
 # =============================================================================
 # MONGREL OPTIONS
 # =============================================================================
-# set :mongrel_servers, httpd_proxy_servers
-# set :mongrel_port, httpd_proxy_port
-# set :mongrel_address, httpd_proxy_address
+# set :mongrel_servers,  apache_proxy_servers
+# set :mongrel_port,  apache_proxy_port
+# set :mongrel_address,  apache_proxy_address
 # set :mongrel_environment, "production"
 # set :mongrel_pid_file, "/var/run/mongrel_cluster/#{application}.pid"
 # set :mongrel_conf, "/etc/mongrel_cluster/#{application}.conf"
