@@ -12,6 +12,18 @@ Install the latest version of the "railsmachine gem":http://github.com/railsmach
   </pre>
 </code>
 
+h2. Install Phusion Passenger and Ruby Enterprise Edition
+
+If you do not have Phusion Passenger and Ruby Enterprise Edition installed on your Rails Machine yet you can run this installer on your server. 
+
+<code>
+  <pre>
+	$ wget http://assets.railsmachine.com/wiki/centos_passenger_install.sh
+	$ sh centos_passenger_install.sh
+  </pre>
+</code>
+
+
 h2. Setup Capistrano
 
 Capify your application:
