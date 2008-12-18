@@ -14,10 +14,10 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :repository do
     scm = fetch(:scm)
     repos_base = "#{user}@#{domain}#{deploy_to}"
-    if scm == :subversion
+    if scm.to_s == 'subversion'
       "svn+ssh://#{repos_base}/repos/trunk"
-    elsif scm == :git
-      "ssh://#{repos_base}/repos"
+    elsif scm.to_s == 'git'
+      "ssh://#{repos_base}/repos/#{application}.git"
     end
   end
 

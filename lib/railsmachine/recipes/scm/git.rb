@@ -5,7 +5,7 @@ Capistrano::Configuration.instance(:must_exist).load do
      
     desc "Setup directory structure and initialize git repository on remote server"
     task :setup, :roles => :scm do
-      dir =  "#{deploy_to}/repos"
+      dir =  "#{deploy_to}/repos/#{application}.git"
       run   "mkdir -p #{dir}"
       sudo  "chown -R #{user}:#{user} #{dir}"
       run   "cd #{dir} && git --bare init"
@@ -34,14 +34,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       puts "Pushing application to the remote server.  The name of the branch is:"
       system  "git remote"
       system  "git push origin master"
-      
-      puts "Creating edge branch on remote"
-      system "git push origin master:refs/heads/edge"
-      puts "create a local tracking edge branch"
-      system "git branch --track edge origin/edge"
-      puts "checking out edge repository"
-      system "git checkout master"
-      
+    
       puts "git setup complete"
       puts "You can clone this repository with git clone #{repository} #{application}"
     end
