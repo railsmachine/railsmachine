@@ -52,7 +52,7 @@ role :scm, domain
 # =============================================================================
 # APPLICATION SERVER OPTIONS
 # ============================================================================= 
-# set :app_server, "passenger"  # mongrel or passenger
+# set :app_server, :mongrel  # :mongrel or :passenger
 
 # =============================================================================
 # WEB SERVER OPTIONS
