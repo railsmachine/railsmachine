@@ -1,6 +1,6 @@
 h1. Five Minute Rails Application Deployment
 
-Ready to deploy your Rails application to "Rails Machine":http://railsmachine.com/? Follow these steps and you'll have it running in no time! Free to utilize Rails Machine's Ask Us Anything Support and "contact us with any questions you have along the way":https://support.railsmachine.com/index.php?pg=request.
+Ready to deploy your Rails application to "Rails Machine":http://railsmachine.com/? Follow these steps and you'll have it running in no time! Feel free to utilize Rails Machine's Ask Us Anything Support and "contact us with any questions you have along the way":https://support.railsmachine.com/index.php?pg=request.
 
 h2. Update Gems
 
