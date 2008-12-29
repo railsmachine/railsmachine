@@ -1,0 +1,83 @@
+Five Minute Rails Application Deployment
+
+Ready to deploy your Rails application to Rails Machine? Follow these steps and you’ll have it running in no time! Free to utilize Rails Machine’s Ask Us Anything Support and contact us with any questions you have along the way.
+
+Update Gems
+
+Install the latest version of the railsmachine gem:
+
+    $ sudo gem install railsmachine
+  
+Install Phusion Passenger and Ruby Enterprise Edition
+
+If you do not have Phusion Passenger and Ruby Enterprise Edition installed on your Rails Machine yet you can run this installer on your server.
+
+    $ wget http://assets.railsmachine.com/wiki/centos_passenger_install.sh
+    $ sh centos_passenger_install.sh
+  
+Setup Capistrano
+
+Capify your application:
+
+     $ capify .
+  
+Configure Capistrano for Rails Machine
+
+The following step customizes your config/deploy.rb with two bits of information you provide:
+
+--name: a simple name for your application. no spaces, please.
+example: my-cool-app
+--domain: the primary domain name for your application. please omit the ‘www’ – we automaticaly alias www.whateveryouprovide.com as needed.
+example: my-cool-app.com
+     $ railsmachine --apply-to . --name my-cool-app --domain my-cool-app.com 
+  
+Please note that the domain name provided will need to be correctly pointed at your Rails Machine account. If you don’t have a DNS provider, we’ve been more than happy with DNS Made Easy.
+
+Update Database Config
+
+Update your applications config/database.yml’s section with your desired MySQL datbase name, username, and password. The database and user will be created for you in a forthcoming step.
+
+Application Setup
+
+Rails Machine defaults to using mongrel + mod_proxy_balancer to run your Rails Application. If you’d like to switch to Phusion Passenger, edit the line in your application’s config/deploy.rb that begins set :app_server to reflect your choice. For example:
+
+     set :app_server, :passenger
+  
+Run the following Capistrano task to setup your MySQL databases and configure your application servers (mongrel/passenger):
+
+     $ cap servers:setup
+  
+Source Control
+
+If you’re already using Source Control…
+
+...edit the lines in your application’s config/deploy.rb that begin set :repository and set :repository. For example:
+
+    set :scm, :git
+    set :repository, "git@github.com:yourname/my-cool-app.git" 
+  
+If you’re not yet using Source Control…
+
+...you can easily setup a Git/Subversion repository on your Rails Machine. Subversion is the default, edit the line in your application’s config/deploy.rb that begins set :scm if you’d like to change it to git. For example:
+
+     set :scm, :git
+  
+Next, run the following task to import your application into a Git/SVN repository on your Rails Machine:
+
+     $ cap repos:setup
+  
+Initial Deploy
+
+That’s it! You’re ready to use Capistrano to deploy your app for the first time:
+
+     $ cap deploy:cold
+  
+Once that’s done, open your application in a web browser and test it out!
+
+To perform a subsequent deploy with Capistrano:
+
+     $ cap deploy
+  
+or, if you need to run migrations as well:
+
+     $ cap deploy:migrations
