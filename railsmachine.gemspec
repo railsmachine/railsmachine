@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = "railsmachine"
-  s.version = "1.0.3"
-  s.date = "2008-12-18"
+  s.version = "1.0.4"
+  s.date = "2008-12-29"
   s.description = "The Rails Machine task library"
   s.summary = "The Rails Machine task library"
   s.email = "support@railsmachine.com"

@@ -1,6 +1,5 @@
 Capistrano::Configuration.instance(:must_exist).load do
-  set :use_mod_rewrite, false
-  load    'config/deploy'
+
   namespace :passenger do
 
     [:start, :stop].each do |t|

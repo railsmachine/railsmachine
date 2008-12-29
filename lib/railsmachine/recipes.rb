@@ -3,14 +3,44 @@ Capistrano::Configuration.instance(:must_exist).load do
   default_run_options[:pty] = true
   set :keep_releases, 3
   set :app_symlinks, nil
-  set :scm, :subversion
+  set :scm, :subversion 
   set :httpd, :apache
-  set :app_server, :mongrel
+  set :app_server, :mongrel 
   set :db_adapter, :mysql
   set :rails_env, "production"
-
-  load    'config/deploy'
   
+  # mongrel defaults
+  set :mongrel_servers, 2
+  set :mongrel_port, 8000
+  set :mongrel_address, "127.0.0.1"
+  set :mongrel_environment, "production"
+  set :mongrel_conf, nil
+  set :mongrel_user, nil
+  set :mongrel_group, nil
+  set :mongrel_prefix, nil
+  set :mongrel_rails, 'mongrel_rails'
+  set :mongrel_clean, false
+  set :mongrel_pid_file, nil
+  set :mongrel_log_file, nil
+  set :mongrel_config_script, nil
+  
+  # passenger defaults
+  set :use_mod_rewrite, false
+  
+  # apache defaults
+  set :apache_server_name, nil            
+  set :apache_conf, nil
+  set :apache_default_vhost, false
+  set :apache_default_vhost_conf, nil
+  set :apache_ctl, "/etc/init.d/httpd"
+  set :apache_server_aliases, []
+  set :apache_proxy_port, 8000
+  set :apache_proxy_servers, 2
+  set :apache_proxy_address, "127.0.0.1"
+  set :apache_ssl_enabled, false
+  set :apache_ssl_ip, nil
+  set :apache_ssl_forward_all, false
+ 
   set :repository do
     scm = fetch(:scm)
     repos_base = "#{user}@#{domain}#{deploy_to}"
@@ -20,7 +50,6 @@ Capistrano::Configuration.instance(:must_exist).load do
       "ssh://#{repos_base}/repos/#{application}.git"
     end
   end
-
   
   task :validate_required_variables do
     validate_option(:scm, :in => [:subversion, :git])
@@ -73,7 +102,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   namespace :app do
   
     desc <<-DESC
-    Setup #{app_server}
+    Setup application server.
     DESC
     task :setup, :roles => :app  do
       case app_server.to_s
@@ -188,6 +217,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :setup, :roles => :scm  do
     begin
       sudo  "chown -R #{user}:#{user} #{deploy_to.gsub(application,'')}"
+      dump_settings
       localrepo.setup
     rescue
       puts "repos:setup failed!"
