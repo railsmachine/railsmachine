@@ -28,10 +28,10 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :use_mod_rewrite, false
   
   # apache defaults
-  set :apache_server_name, nil            
-  set :apache_conf, nil
-  set :apache_default_vhost, false
-  set :apache_default_vhost_conf, nil
+  set :apache_server_name, domain            
+  set :apache_conf, "/etc/httpd/conf/apps/#{application}.conf"
+  set :apache_default_vhost, true
+  set :apache_default_vhost_conf, "/etc/httpd/conf/default.conf"
   set :apache_ctl, "/etc/init.d/httpd"
   set :apache_server_aliases, []
   set :apache_proxy_port, 8000
