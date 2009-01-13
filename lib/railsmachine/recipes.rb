@@ -8,6 +8,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :app_server, :mongrel 
   set :db_adapter, :mysql
   set :rails_env, "production"
+  set :domain, nil
   
   # mongrel defaults
   set :mongrel_servers, 2
