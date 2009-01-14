@@ -217,7 +217,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     DESC
     task :setup, :roles => :scm  do
     begin
-      sudo  "chown -R #{user}:#{user} #{deploy_to.gsub(application,'')}"
+      sudo  "chown #{user}:#{user} #{deploy_to.gsub(application,'')}"
       localrepo.setup
     rescue
       puts "repos:setup failed!"
