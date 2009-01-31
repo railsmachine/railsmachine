@@ -24,8 +24,6 @@ Capistrano.plugin :mysql_helper, MySQLMethods
 
 Capistrano::Configuration.instance(:must_exist).load do
   
-  set :mysql_admin, nil
-  
   namespace :db do
   
     desc "Execute MySQL statements using --execute option. Set the 'sql' variable."

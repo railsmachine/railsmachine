@@ -42,6 +42,9 @@ Capistrano::Configuration.instance(:must_exist).load do
   set :apache_ssl_ip, nil
   set :apache_ssl_forward_all, false
  
+  # mysql defaults
+  set :mysql_admin, nil
+ 
   set :repository do
     scm = fetch(:scm)
     repos_base = "#{user}@#{domain}#{deploy_to}"
