@@ -18,8 +18,8 @@ If you do not have Phusion Passenger and Ruby Enterprise Edition installed on yo
 
 <pre>
   <code>
-	$ wget http://assets.railsmachine.com/wiki/centos_passenger_install.sh
-	$ sh centos_passenger_install.sh
+    $ wget http://assets.railsmachine.com/wiki/centos_passenger_install.sh
+    $ sh centos_passenger_install.sh
   </code>
 </pre>
 
@@ -77,7 +77,7 @@ h2. Source Control
 
 h3. If you're already using Source Control...
 
-...edit the lines in your application's @config/deploy.rb@ that begin @set :repository@ and @set :repository@. For example:
+...edit the lines in your application's @config/deploy.rb@ that begin @set :scm@ and @set :repository@. For example:
 
 <pre>
   <code>
