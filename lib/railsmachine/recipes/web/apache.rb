@@ -8,6 +8,16 @@ Capistrano::Configuration.instance(:must_exist).load do
     set to true."
     task :configure, :roles => :web do      
       set_apache_conf
+      conf_dir = File.dirname(apache_conf)
+
+      # Try to make the conf directory, in case user has configured something
+      # different, or conf/apps isn't present in the system image
+      run("[ -d #{conf_dir} ] && echo \"yes\" || echo \"no\"") do |c, s, o|
+        if o =~ /no?/
+          puts "Directory #{conf_dir} not found, creating it..."
+          send(run_method, "mkdir -p #{conf_dir}")
+        end
+      end
       
       run("[ -f #{ apache_conf} ] && echo \"yes\" || echo \"no\"") do |c, s, o|
         if o =~ /yes?/
@@ -63,7 +73,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   def set_apache_conf
     if  apache_default_vhost
       set :apache_conf, "/etc/httpd/conf/default.conf" unless  apache_default_vhost_conf
-    else 
+    else
       set :apache_conf, "/etc/httpd/conf/apps/#{application}.conf" unless  apache_conf
     end
   end
