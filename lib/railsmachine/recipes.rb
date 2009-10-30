@@ -82,7 +82,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     Used to configure your deployment environment in one command.
     DESC
     task :setup  do
-      sudo  "chown -R #{user}:#{user} #{deploy_to.gsub(application,'')}"
+      sudo  "chown -R #{user}:#{user} #{File.dirname(deploy_to)}"
       deploy.setup
     begin
       db.setup
